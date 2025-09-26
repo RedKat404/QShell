@@ -31,8 +31,8 @@ int clrcns(void){
 #endif
     return 0;
 }
+//made sure to release memory on fail
 char* cwd(char** buf , int MAX) {
-    // Allocate memory for the buffer to hold the current directory path
     *buf = malloc(MAX);
     if (*buf == NULL) {
         perror("Memory allocation failed");
@@ -40,21 +40,19 @@ char* cwd(char** buf , int MAX) {
     }
 
 #ifdef _WIN32
-    // For Windows, use _getcwd
     if (_getcwd(*buf, MAX) != NULL) {
         return *buf;
     } else {
         perror("Error in `cwd` [WIN32]");
-        free(*buf);  // Clean up allocated memory on error
+        free(*buf);
         return NULL;
     }
 #else
-    // For POSIX (Linux/Other), use getcwd
     if (getcwd(*buf, MAX) != NULL) {
         return *buf;
     } else {
         perror("Error in `cwd` [LINUX/OTHER]");
-        free(*buf);  // Clean up allocated memory on error
+        free(*buf);
         return NULL;
     }
 #endif
@@ -109,8 +107,12 @@ int SOCKCONN(char* IP, int PORT){
         printf("Connected to \"%s\".\n",IP);
     }
 }
-int SOCKSEND(char* DATA){
-    printf("Not implemented.");
+int SOCKSEND(char* DATA,int CONN){
+    #ifdef _WIN32
+    printf("WIN32 Not implemented.");
+    #else
+    send(CONN,DATA,strlen(DATA),0);
+    #endif
 }
 struct Version {
 	int major;
@@ -122,11 +124,11 @@ int main(void){
     FILE* fptr;
     int running = 1;
     char* buf[100];
-	struct Version ver;
-	ver.major=1;
-	ver.minor=2;
-	ver.patch=0;
-	int curcon;
+    struct Version ver;
+    ver.major=1;
+    ver.minor=2;
+    ver.patch=0;
+    int curcon;
     char *tok=malloc(50);
 r:
     //General Commands
@@ -314,12 +316,28 @@ r:
 		tok=strtok(inp,s);
 		int x=0;
 		while (tok!=0){
-				tok=strtok(0,s);
-				x+=1;
-				if (x==1){
-					SOCKCONN(tok,80);
-				}
+			tok=strtok(0,s);
+			x+=1;
+			if (x==1){
+				curcon=SOCKCONN(tok,80);
+			}
 		}
+    }
+    //TO DO: FIX `EXIT CODE: 13`
+    else if (prefix("httpsend",inp)){
+        strcpy(dest,inp);
+        tok=realloc(tok,50);
+        if (tok==NULL){
+            perror("MEMORY ERROR WHEN REALLOCATING `tok`\nERROR");
+        }
+        tok = strtok(inp,s);
+        int x=0;
+        while (tok!=0) {
+            x+=1;
+            if (x==1) {
+                SOCKSEND(tok,curcon);
+            }
+        }
     }
     goto r;
     }
