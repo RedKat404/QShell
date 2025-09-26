@@ -91,6 +91,7 @@ int SOCKCONN(char* IP, int PORT){
     if (SOCKTEST()==0){
         #ifdef _WIN32
         printf("_WIN32 Is currently unavailable.");
+        return 1;
         #else
         int status, valread, client_fd;
         struct sockaddr_in serv_addr;
@@ -110,6 +111,7 @@ int SOCKCONN(char* IP, int PORT){
 int SOCKSEND(char* DATA,int CONN){
     #ifdef _WIN32
     printf("WIN32 Not implemented.");
+    return 1;
     #else
     send(CONN,DATA,strlen(DATA),0);
     #endif
