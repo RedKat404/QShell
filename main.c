@@ -90,7 +90,7 @@ int SOCKTEST(){
 int SOCKCONN(char* IP, int PORT){
     if (SOCKTEST()==0){
         #ifdef _WIN32
-        printf("_WIN32 Version unmade.");
+        printf("_WIN32 Is currently unavailable.");
         #else
         int status, valread, client_fd;
         struct sockaddr_in serv_addr;
