@@ -72,6 +72,7 @@ int SOCKTEST(){
         if((s = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET){
             printf("Could not create socket : %d", WSAGetLastError());
         }
+	closesocket(s);
         printf("Socket created.\n");
         return 0;
     #else
@@ -90,8 +91,10 @@ int SOCKTEST(){
 int SOCKCONN(char* IP, int PORT){
     if (SOCKTEST()==0){
         #ifdef _WIN32
-        printf("_WIN32 Is currently unavailable.");
-        return 1;
+	IntPtr pSockAddr = IntPtr.Zero;
+	int RIP = WSAStringToAddressW(IP,System.Net.Sockets.AdressFamily.InterNetwork,IntPtr.Zero);
+        SOCKET s=socket(AF_INET, SOCK_STREAM, 0);
+	connect(s,inet_addr(IP),strlen(inet_addr(IP)));
         #else
         int status, valread, client_fd;
         struct sockaddr_in serv_addr;
