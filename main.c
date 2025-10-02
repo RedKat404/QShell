@@ -232,6 +232,23 @@ r:
             }
             free(tok);
         }
+        else if(prefix("exec",inp)){ //Executing commands that arent built in
+            strcpy(dest,inp);
+            tok=realloc(tok,50);
+            if (tok==NULL){
+                perror("MEMORY ERROR WHEN REALLOCATING `tok` IN COMMAND `exec`\nERROR");
+            }
+            tok=strtok(inp,s); //TO FIX: CANT HANDLE SPACES IN THE COMMAND D:<
+            int x = 0;
+            while (tok!=0){
+                tok=strtok(0,s);
+                x+=1;
+                if(x==1){
+                    printf("%s\n",tok);
+                    system(tok);
+                }
+            }
+        }
         //Directory Commands
         else if (prefix("cd",inp)){ //Mostly just handling differences in OS...
             strcpy(dest,inp);
